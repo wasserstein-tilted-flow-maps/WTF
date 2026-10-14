@@ -1,0 +1,6 @@
+# Exact reward gradient: pull grad r back through the flow-map Jacobian instead of using the
+# Euclidean gradient of the reported recipe (estimator.detach: all). Paper: exact vs. Euclidean ablation.
+defaults: ../wtf_t2i.yaml
+
+estimator:
+  detach: none

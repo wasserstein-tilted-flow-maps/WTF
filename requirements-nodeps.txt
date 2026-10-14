@@ -1,0 +1,7 @@
+# These packages over-pin dependencies that conflict with the rest of the stack:
+#   image-reward 1.5 pins timm==0.6.13 (open_clip_torch needs timm>=1.0.17)
+#   hpsv2 1.2.0 pins protobuf<4 and test-only pytest versions (wandb needs protobuf>4.21)
+# Install these without their dependencies: pip install --no-deps -r requirements-nodeps.txt
+hpsv2==1.2.0
+image-reward==1.5
+fairscale==0.4.13

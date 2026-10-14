@@ -1,0 +1,57 @@
+# WTF on TiM-T2I (text-to-image). This is the recipe of the reported run: every value matches the run's
+# saved arguments (reference/t2i_args.json). The reported checkpoint is the last one, at step 1460.
+substrate:
+  ckpt:       ${TIM_CKPT}
+  config:     ${TIM_CONFIG}
+  height:     512
+  width:      512
+  attn_type:  fused_attn        # required: the flash_attn path aborts silently during training
+  reward:     hps
+
+adaptation:
+  lora_rank:    16
+  lora_alpha:   16
+  dual_adapter: false           # one LoRA adapter serves the diagonal and off-diagonal roles
+
+objective:
+  distill_weight: 0.5           # beta, weight of the flow-map self-distillation term
+  distill_mode:   tim
+  distill_method: jvp
+  target_control_fraction: 30.0 # lambda, reward scale (normalized, see no_w_rew_norm)
+  eta_mode:       none
+
+estimator:
+  detach:             all       # Euclidean reward gradient; `none` is the exact pullback
+  rollout_steps:      1
+  cost_at_tau:        true      # running cost at the sampled tau, as in the paper; the reported numbers and the
+                                # released checkpoint used false (cost at t): similar rewards, slightly higher diversity
+  num_tau_samples:    4         # no effect (one tau sample per step); kept for parity with the saved arguments
+  xt_chain_steps:     1
+  quantile_clip_pct:  0.8       # per-sample reward-gradient clip at the 0.8 batch quantile
+  frozen_model_mode:  active
+  cfg_detach_uncond:  true
+  cfg_scale:          2.5
+  no_w_rew_norm:      false     # lambda is normalized by the velocity / reward-gradient EMA ratio
+  w_rew_warmup_iters: 0
+  reward_jitter_pairs: 1        # reward-gradient smoothing (pairs P, scale sigma) = (1, 0.20)
+  reward_jitter_sigma: 0.2
+
+hjb:
+  consist_weight:  0.0
+  boundary_weight: 0.0
+  eps_time:        0.01
+
+optim:
+  lr:               0.001
+  adam_beta2:       0.999
+  weight_decay:     0.01
+  lr_warmup_steps:  20
+  batch_size:       2           # per GPU; global batch = batch_size x gpus x grad_accum = 80
+  grad_accum:       5
+  gpus:             8
+  loss_ema_decay:   0.995
+  out_dir:          exps/wtf_t2i
+  num_iters:        1460
+  checkpoint_steps: 10          # dense checkpoints, used by t2i/scripts/reward_curve.py
+  sampling_steps:   99999
+  seed:             3
