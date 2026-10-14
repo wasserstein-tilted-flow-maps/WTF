@@ -1,0 +1,5 @@
+# Exact reward gradient: full Jacobian pullback through both rollout hops.
+defaults: ../wtf_imagenet.yaml
+
+estimator:
+  detach: none

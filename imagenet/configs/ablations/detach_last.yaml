@@ -1,0 +1,5 @@
+# Partial pullback: keep the Jacobian of the first hop (x_t -> x_tau) and cut the second (x_tau -> x_1).
+defaults: ../wtf_imagenet.yaml
+
+estimator:
+  detach: last

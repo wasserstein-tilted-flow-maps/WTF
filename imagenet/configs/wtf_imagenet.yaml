@@ -1,0 +1,46 @@
+# WTF on DMF XL/2 (ImageNet-256, full fine-tuning). This is the recipe of the reported runs: every
+# training argument matches their saved arguments (reference/imagenet_args_seed1.json) apart from the seed.
+# The reported checkpoints are at step 12500 for seeds 0, 1 and 2.
+substrate:
+  pretrained: ${DMF_CKPT}       # required: dmf_xl_2_256.pt from huggingface.co/kyungmnlee/DMF
+  model:      DMFT-XL/2
+  dmf_depth:  20
+  resolution: 256
+  num_shards: 32                # only read with --no-synthetic-data; training is data-free by default
+
+objective:
+  target_control_fraction: 15.0 # lambda, reward scale (normalized by the velocity / reward-gradient EMA ratio)
+  diag_prob: 0.5                # no effect on the WTF loss; kept for parity with the saved arguments
+  anchor_weight: 0.0
+
+estimator:
+  detach: all                   # Euclidean reward gradient; `none` / `last` keep the Jacobian pullback
+  num_tau_samples: 1
+  use_logvar: true              # selects the WTF objective in imagenet/src/loss.py; keep true
+  use_token_cond: false
+
+runtime:
+  attn_func:   base
+  num_workers: 2
+
+guidance:                       # substrate guidance settings, kept for parity with the saved arguments
+  g_type: default
+  omega: 0.6
+  g_min: 0.0
+  g_max: 0.7
+  cfg_prob: 0.1
+
+optim:
+  lr: 1.0e-4
+  ema_decay: 0.999              # the EMA weights are the frozen reference and the evaluated model
+  batch_size: 64                # global batch, split across GPUs
+  max_train_steps: 12500
+  checkpointing_steps: 2500
+  sampling_steps: 2500
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  max_grad_norm: 1.0
+  mixed_precision: bf16
+  seed: 0
+  exp_name: wtf_imagenet
+  project_name: wtf
