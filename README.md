@@ -267,7 +267,8 @@ docs/                      setup, configuration and evaluation details
 
 ## Acknowledgements
 
-This code builds on [TiM](https://github.com/WZDTHU/TiM) (text-to-image substrate),
+This code builds on [VFM](https://github.com/abbasmammadov/VFM) (base for the loss functions and reward code),
+[TiM](https://github.com/WZDTHU/TiM) (text-to-image substrate),
 [Decoupled MeanFlow](https://github.com/kyungmnlee/dmf) (ImageNet substrate and the JVP attention kernels),
 and VGG-Flow (prompt sets and reward utilities). Rewards and metrics use
 [HPSv2](https://github.com/tgxs002/HPSv2), [PickScore](https://github.com/yuvalkirstain/PickScore),
